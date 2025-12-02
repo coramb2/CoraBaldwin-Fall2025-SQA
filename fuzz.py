@@ -15,8 +15,9 @@ from mining.mining import (
     getPythonFileCount,
 )
 
-# Always create empty log first (ensures CI artifact exists)
-Path("fuzz_results.log").touch(exist_ok=True)
+# Always create the log file before fuzzing begins
+LOGFILE = Path("fuzz_results.log")
+LOGFILE.touch(exist_ok=True)
 
 LOGFILE = Path("fuzz_results.log")
 
@@ -83,9 +84,6 @@ def fuzz_getPythonFileCount():
 
 
 def main():
-    if LOGFILE.exists():
-        LOGFILE.unlink()
-
     print("Running fuzzing...")
 
     fuzz_giveTimeStamp()
