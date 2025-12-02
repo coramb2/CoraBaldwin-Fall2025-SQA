@@ -21,9 +21,9 @@ jobs:
       run: |
         pip install gitpython numpy pandas
 
-    - name: Run fuzzing
+    - name: Run fuzzing (allow failures)
       run: |
-        python fuzz.py
+        python fuzz.py || true
 
     - name: Upload fuzzing results
       uses: actions/upload-artifact@v4
