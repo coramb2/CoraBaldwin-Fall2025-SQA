@@ -9,12 +9,22 @@ import shutil
 from git import Repo
 from git import exc 
 
+# Modified
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    filename="logs/mlforensics.log",
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s"
+)
 
 def giveTimeStamp():
-  tsObj = time.time()
-  strToret = datetime.fromtimestamp(tsObj).strftime('%Y-%m-%d %H:%M:%S')
-  return strToret
-  
+    logger.info("giveTimeStamp() called")
+    tsObj = time.time()
+    strToret = datetime.fromtimestamp(tsObj).strftime('%Y-%m-%d %H:%M:%S')
+    logger.info(f"Timestamp returned: {strToret}")
+    return strToret
 
 def deleteRepo(dirName, type_):
     print(':::' + type_ + ':::Deleting ', dirName)
@@ -24,26 +34,27 @@ def deleteRepo(dirName, type_):
     except OSError:
         print('Failed deleting, will try manually')  
         
-        
 def dumpContentIntoFile(strP, fileP):
-    fileToWrite = open( fileP, 'w')
-    fileToWrite.write(strP )
+    logger.info(f"dumpContentIntoFile() called with file={fileP}, len={len(strP)}")
+    fileToWrite = open(fileP, 'w')
+    fileToWrite.write(strP)
     fileToWrite.close()
+    logger.info(f"Wrote content to {fileP}")
     return str(os.stat(fileP).st_size)
   
-  
 def makeChunks(the_list, size_):
+    logger.info(f"makeChunks() called with size={size_}, list_len={len(the_list)}")
     for i in range(0, len(the_list), size_):
-        yield the_list[i:i+size_]
-        
-        
+        chunk = the_list[i:i+size_]
+        logger.info(f"Yielding chunk: {chunk}")
+        yield chunk
+            
 def cloneRepo(repo_name, target_dir):
     cmd_ = "git clone " + repo_name + " " + target_dir 
     try:
        subprocess.check_output(['bash','-c', cmd_])    
     except subprocess.CalledProcessError:
        print('Skipping this repo ... trouble cloning repo:', repo_name )
-
 
 def checkPythonFile(path2dir): 
     usageCount = 0
@@ -64,12 +75,11 @@ def checkPythonFile(path2dir):
                                 print('item_->->->',  content_)                    
     return usageCount  
     
-
-def days_between(d1_, d2_): ## pass in date time objects, if string see commented code 
-    # d1_ = datetime.strptime(d1_, "%Y-%m-%d")
-    # d2_ = datetime.strptime(d2_, "%Y-%m-%d")
-    return abs((d2_ - d1_).days)
-    
+def days_between(d1_, d2_):
+    logger.info(f"days_between() called: {d1_} vs {d2_}")
+    diff = abs((d2_ - d1_).days)
+    logger.info(f"Difference: {diff} days")
+    return diff
     
 def getDevEmailForCommit(repo_path_param, hash_):
     author_emails = []
@@ -126,18 +136,17 @@ def getDevDayCount(full_path_to_repo, branchName='master', explore=1000):
         ds_life_days   = 0
     ds_life_months = round(float(ds_life_days)/float(30), 5)
     
-    return len(repo_emails) , len(all_commits) , ds_life_days, ds_life_months 
-            
+    return len(repo_emails) , len(all_commits) , ds_life_days, ds_life_months         
   
 def getPythonFileCount(path2dir):
+    logger.info(f"getPythonFileCount() called on {path2dir}")
     valid_list = [] 
     for _, _, filenames in os.walk(path2dir):
         for file_ in filenames:
-            if ((file_.endswith('py')) or (file_.endswith('ipynb'))):
+            if file_.endswith('py') or file_.endswith('ipynb'):
                 valid_list.append(file_)
-    return len(valid_list)   
-    
-    
+    logger.info(f"Python files found: {len(valid_list)}")
+    return len(valid_list)  
 
 def cloneRepos(repo_list, dev_threshold=3, python_threshold=0.10, commit_threshold = 25): 
     counter = 0     
@@ -188,8 +197,6 @@ def cloneRepos(repo_list, dev_threshold=3, python_threshold=0.10, commit_thresho
             print('#'*100)
         print('*'*10)
         
-   
-
 if __name__=='__main__':
     repos_df = pd.read_csv('PARTIAL_REMAINING_GITHUB.csv', sep='delimiter')
     print(repos_df.head())
@@ -199,13 +206,11 @@ if __name__=='__main__':
     t1 = time.time()
     print('Started at:', giveTimeStamp() )
     print('*'*100 )
-
-    
+ 
     print('Repos to download:', len(list_)) 
     ## need to create chunks as too many repos 
     chunked_list = list(makeChunks(list_, 100))  ### list of lists, at each batch download 1000 repos 
     cloneRepos(chunked_list)
-
 
     print('*'*100 )
     print('Ended at:', giveTimeStamp() )

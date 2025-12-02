@@ -1,0 +1,32 @@
+name: SQA-CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  run-fuzz-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install gitpython numpy pandas
+
+    - name: Run fuzzing
+      run: |
+        python fuzz.py
+
+    - name: Upload fuzzing results
+      uses: actions/upload-artifact@v3
+      with:
+        name: fuzz-results
+        path: fuzz_results.log
