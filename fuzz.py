@@ -15,6 +15,9 @@ from mining.mining import (
     getPythonFileCount,
 )
 
+# Always create empty log first (ensures CI artifact exists)
+Path("fuzz_results.log").touch(exist_ok=True)
+
 LOGFILE = Path("fuzz_results.log")
 
 
