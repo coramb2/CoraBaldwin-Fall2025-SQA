@@ -15,16 +15,18 @@ from mining.mining import (
     getPythonFileCount,
 )
 
-# Always create the log file before fuzzing begins
+# LOGFILE setup – always created, always contains something
 LOGFILE = Path("fuzz_results.log")
 LOGFILE.touch(exist_ok=True)
 
-LOGFILE = Path("fuzz_results.log")
+# Ensure artifact always has content
+with open(LOGFILE, "w") as f:
+    f.write("Fuzzing started.\n")
 
 
 def log_failure(func, inputs, exc):
     with open(LOGFILE, "a") as f:
-        f.write("\n" + "="*70 + "\n")
+        f.write("\n" + "=" * 70 + "\n")
         f.write(f"Function: {func}\n")
         f.write(f"Inputs: {inputs}\n")
         f.write(f"Exception: {repr(exc)}\n")
@@ -53,7 +55,7 @@ def fuzz_makeChunks():
 def fuzz_dumpContentIntoFile():
     for _ in range(200):
         content = "".join(random.choice(string.ascii_letters) for _ in range(20))
-        file = f"tmp_fuzz_{random.randint(0,9999)}.txt"
+        file = f"tmp_fuzz_{random.randint(0, 9999)}.txt"
         try:
             dumpContentIntoFile(content, file)
         except Exception as e:
