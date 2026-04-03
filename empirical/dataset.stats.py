@@ -47,6 +47,8 @@ def getBranch(path):
         return 'master' 
 
 def getFileLength(file_):
+    if '..' in file_:
+        raise Exception('Invalid file path')
     return sum(1 for line in open(file_, encoding='latin-1'))
 
 def getDevEmailForCommit(repo_path_param, hash_):

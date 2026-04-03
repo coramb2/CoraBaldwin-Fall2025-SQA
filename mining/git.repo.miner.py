@@ -94,12 +94,16 @@ def getMLStats(repo_path):
 
 def getMLLibraryUsage(path2dir): 
     usageCount  = 0 
+    base_real = os.path.realpath(path2dir)
     for root_, dirnames, filenames in os.walk(path2dir):
         for file_ in filenames:
             full_path_file = os.path.join(root_, file_) 
             if(os.path.exists(full_path_file)):
                 if (file_.endswith('py'))  :
-                    f = open(full_path_file, 'r', encoding='latin-1')
+                    target_real = os.path.realpath(full_path_file)
+                    if os.path.commonpath([base_real, target_real]) != base_real:
+                        raise Exception('Invalid file path')
+                    f = open(target_real, 'r', encoding='latin-1')
                     fileContent  = f.read()
                     fileContent  = fileContent.split('\n') 
                     fileContents = [z_.lower() for z_ in fileContent if z_!='\n' ]
