@@ -36,6 +36,8 @@ def deleteRepo(dirName, type_):
         
 def dumpContentIntoFile(strP, fileP):
     logger.info(f"dumpContentIntoFile() called with file={fileP}, len={len(strP)}")
+    if '..' in fileP:
+        raise Exception('Invalid file path')
     fileToWrite = open(fileP, 'w')
     fileToWrite.write(strP)
     fileToWrite.close()

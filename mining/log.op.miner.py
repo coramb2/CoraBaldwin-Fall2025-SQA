@@ -16,6 +16,8 @@ LOGGING_KW = 'logging'
 def checkIfParsablePython( pyFile ):
 	flag = True 
 	try:
+		if '..' in pyFile:
+			raise Exception('Invalid file path')
 		full_tree = ast.parse( open( pyFile ).read())    
 	except (SyntaxError, UnicodeDecodeError) as err_ :
 		flag = False 
@@ -34,6 +36,8 @@ def getAllPythonFilesinRepo(path2dir):
 
 def hasLogImport( file_ ):
     IMPORT_FLAG = False 
+    if '..' in file_:
+        raise Exception('Invalid file path')
     tree_object = ast.parse( open( file_ ).read())    
     for stmt_ in tree_object.body:
         for node_ in ast.walk(stmt_):
@@ -144,6 +148,8 @@ def getPythonAtrributeFuncs(pyTree):
     return attrib_call_list 
 
 def getLogStatements( pyFile ): 
+    if '..' in pyFile:
+        raise Exception('Invalid file path')
     tree_object = ast.parse( open( pyFile ).read())    
     func_decl_list = getPythonAtrributeFuncs(tree_object)
     for func_decl_ in func_decl_list:

@@ -19,6 +19,8 @@ def getAllSLOC(df_param, csv_encoding='latin-1' ):
     total_sloc = 0
     all_files = np.unique( df_param['FILE_FULL_PATH'].tolist() ) 
     for file_ in all_files:
+        if '..' in file_:
+            raise Exception('Invalid file path')
         total_sloc = total_sloc + sum(1 for line in open(file_, encoding=csv_encoding))
     return total_sloc
 
